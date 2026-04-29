@@ -394,14 +394,26 @@ let dates = [];
 let currentDateIdx = 0;
 
 function initMes(goToToday = false) {
-  dates = getDatesForMes();
   if (goToToday) {
-    // Abrir en el dia de hoy; si no existe en los datos, ir al ultimo disponible
+    // Buscar el mes que contiene el dia de hoy
     const today = new Date().toISOString().slice(0, 10);
-    const todayIdx = dates.indexOf(today);
-    currentDateIdx = todayIdx >= 0 ? todayIdx : dates.length - 1;
+    const todayMesKey = today.slice(0, 7); // "yyyy-MM"
+    const todayMesIdx = mesKeys.indexOf(todayMesKey);
+    if (todayMesIdx >= 0) {
+      // El mes de hoy esta en los datos -> ir a ese mes y al dia de hoy
+      currentMesIdx = todayMesIdx;
+      dates = getDatesForMes();
+      const todayIdx = dates.indexOf(today);
+      currentDateIdx = todayIdx >= 0 ? todayIdx : 0;
+    } else {
+      // El mes de hoy no existe -> usar el mes mas reciente, dia 1
+      currentMesIdx = mesKeys.length - 1;
+      dates = getDatesForMes();
+      currentDateIdx = 0;
+    }
   } else {
     // Al cambiar de mes siempre empezar desde el dia 1
+    dates = getDatesForMes();
     currentDateIdx = 0;
   }
   // Etiqueta del mes
